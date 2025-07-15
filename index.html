@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Simple webcam video capture application">
+    <meta name="author" content="Your Name">
+    <title>SIC VIO - Webcam Capture</title>
+    <style>
+        /* Container styling for centering and border */
+        #container {
+            margin: 20px auto;
+            width: 640px; /* Increased width for better video quality */
+            height: 480px; /* Standard 4:3 aspect ratio */
+            border: 10px solid #333;
+            border-radius: 8px; /* Added border radius for better aesthetics */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Subtle shadow for depth */
+        }
+
+        /* Video element styling */
+        #videoElement {
+            width: 100%;
+            height: 100%;
+            background-color: #666;
+            display: block;
+        }
+
+        /* Error message styling */
+        #errorMsg {
+            color: red;
+            text-align: center;
+            margin-top: 10px;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Basic page styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>SIC VIO - Webcam Capture</h1>
+    <div id="container">
+        <video autoplay="true" id="videoElement" playsinline></video>
+    </div>
+    <p id="errorMsg"></p>
+
+    <script>
+        // Select video element from DOM
+        const video = document.querySelector("#videoElement");
+        const errorMsgElement = document.querySelector("#errorMsg");
+
+        // Function to initialize webcam stream
+        function initWebcam() {
+            // Check if browser supports mediaDevices API
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ 
+                    video: true,
+                    audio: false // Explicitly disable audio
+                })
+                .then(function(stream) {
+                    // Assign stream to video element
+                    video.srcObject = stream;
+                    video.play().catch(err => {
+                        console.error("Error playing video:", err);
+                        errorMsgElement.textContent = "Error playing video. Please try again.";
+                    });
+                })
+                .catch(function(error) {
+                    // Handle specific errors
+                    let errorMessage = "Error accessing webcam: ";
+                    if (error.name === 'NotAllowedError') {
+                        errorMessage += "Permission denied. Please allow webcam access.";
+                    } else if (error.name === 'NotFoundError') {
+                        errorMessage += "No webcam found. Please connect a camera.";
+                    } else {
+                        errorMessage += error.message;
+                    }
+                    console.error(errorMessage, error);
+                    errorMsgElement.textContent = errorMessage;
+                });
+            } else {
+                // Handle unsupported browser
+                const errorMessage = "Webcam not supported by this browser.";
+                console.error(errorMessage);
+                errorMsgElement.textContent = errorMessage;
+            }
+        }
+
+        // Initialize webcam when document is loaded
+        document.addEventListener('DOMContentLoaded', initWebcam);
+
+        // Clean up stream when window is closed
+        window.addEventListener('beforeunload', () => {
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+            }
+        });
+    </script>
+
+    <!-- About Section -->
+    <section style="margin-top: 20px; text-align: center;">
+        <h2>About SIC VIO</h2>
+        <p>
+            SIC VIO is a simple webcam capture application built using HTML5, CSS, and JavaScript.
+            It demonstrates basic webcam access using the MediaDevices API.
+        </p>
+        <p>
+            <a href="https://github.com/NasimReja077/Webcam-Capture.git" target="_blank">
+                View Source on GitHub
+            </a>
+        </p>
+    </section>
+
+    <!-- Documentation -->
+    <section style="margin-top: 20px; text-align: center;">
+        <h2>Documentation</h2>
+        <p>
+            To use this application:
+        </p>
+        <ol style="text-align: left; display: inline-block;">
+            <li>Ensure you have a webcam connected to your device</li>
+            <li>Allow browser permissions for camera access</li>
+            <li>The video feed should start automatically</li>
+        </ol>
+        <p>
+            For development setup, check the GitHub repository for instructions:
+            <a href="https://github.com/NasimReja077/Webcam-Capture/blob/main/README.md" target="_blank">
+                README.md
+            </a>
+        </p>
+    </section>
+</body>
+</html>
